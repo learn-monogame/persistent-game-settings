@@ -134,7 +134,7 @@ namespace GameProject {
             File.WriteAllText(jsonPath, jsonString);
         }
 
-        public void ToggleFullscreen() {
+        private void ToggleFullscreen() {
             bool oldFullscreen = _settings.IsFullscreen;
 
             if (_settings.IsBorderless) {
@@ -153,7 +153,7 @@ namespace GameProject {
                 UnsetFullscreen();
             }
         }
-        public void ToggleBorderless() {
+        private void ToggleBorderless() {
             bool oldFullscreen = _settings.IsFullscreen;
 
             _settings.IsBorderless = !_settings.IsBorderless;
