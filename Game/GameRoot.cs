@@ -134,8 +134,8 @@ namespace GameProject {
             File.WriteAllText(jsonPath, jsonString);
         }
 
-        private void ToggleFullscreen() {
-            bool oldFullscreen = _settings.IsFullscreen;
+        public void ToggleFullscreen() {
+            bool oldIsFullscreen = _settings.IsFullscreen;
 
             if (_settings.IsBorderless) {
                 _settings.IsBorderless = false;
@@ -143,24 +143,20 @@ namespace GameProject {
                 _settings.IsFullscreen = !_settings.IsFullscreen;
             }
 
-            if (_settings.IsFullscreen) {
-                if (oldFullscreen) {
-                    ApplyHardwareMode();
-                } else {
-                    SetFullscreen();
-                }
-            } else {
-                UnsetFullscreen();
-            }
+            ApplyFullscreenChange(oldIsFullscreen);
         }
-        private void ToggleBorderless() {
-            bool oldFullscreen = _settings.IsFullscreen;
+        public void ToggleBorderless() {
+            bool oldIsFullscreen = _settings.IsFullscreen;
 
             _settings.IsBorderless = !_settings.IsBorderless;
             _settings.IsFullscreen = _settings.IsBorderless;
 
+            ApplyFullscreenChange(oldIsFullscreen);
+        }
+
+        private void ApplyFullscreenChange(bool oldIsFullscreen) {
             if (_settings.IsFullscreen) {
-                if (oldFullscreen) {
+                if (oldIsFullscreen) {
                     ApplyHardwareMode();
                 } else {
                     SetFullscreen();
@@ -169,7 +165,6 @@ namespace GameProject {
                 UnsetFullscreen();
             }
         }
-
         private void ApplyHardwareMode() {
             _graphics.HardwareModeSwitch = !_settings.IsBorderless;
             _graphics.ApplyChanges();
