@@ -1,10 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.IO;
+using System.Text.Json;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Apos.Input;
-using System;
-using System.IO;
-using System.Text.Json;
 using FontStashSharp;
 
 namespace GameProject {
