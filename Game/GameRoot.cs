@@ -68,6 +68,13 @@ namespace GameProject {
             if (_toggleBorderless.Pressed()) {
                 ToggleBorderless();
             }
+            if (_resetSettings.Pressed()) {
+                bool oldIsFullscreen = _settings.IsFullscreen;
+                _settings = new Settings();
+                SaveJson("Settings.json", _settings);
+
+                ApplyFullscreenChange(oldIsFullscreen);
+            }
 
             InputHelper.UpdateCleanup();
             base.Update(gameTime);
@@ -88,8 +95,7 @@ namespace GameProject {
             base.Draw(gameTime);
         }
 
-        private string RootPath => AppDomain.CurrentDomain.BaseDirectory;
-        private string GetPath(string name) => Path.Combine(RootPath, name);
+        private string GetPath(string name) => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, name);
         private T LoadJson<T>(string name) where T : new() {
             T json;
             string jsonPath = GetPath(name);
@@ -214,5 +220,6 @@ namespace GameProject {
                 new KeyboardCondition(Keys.Enter)
             );
         ICondition _toggleBorderless = new KeyboardCondition(Keys.F11);
+        ICondition _resetSettings = new KeyboardCondition(Keys.R);
     }
 }
