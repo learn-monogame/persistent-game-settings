@@ -91,51 +91,6 @@ namespace GameProject {
             base.Draw(gameTime);
         }
 
-        private string GetPath(string name) => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, name);
-        private T LoadJson<T>(string name) where T : new() {
-            T json;
-            string jsonPath = GetPath(name);
-
-            if (File.Exists(jsonPath)) {
-                var options = new JsonSerializerOptions {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                };
-                json = JsonSerializer.Deserialize<T>(File.ReadAllText(jsonPath), options);
-            } else {
-                json = new T();
-            }
-
-            return json;
-        }
-        private T EnsureJson<T>(string name) where T : new() {
-            T json;
-            string jsonPath = GetPath(name);
-
-            var options = new JsonSerializerOptions {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true,
-            };
-
-            if (File.Exists(jsonPath)) {
-                json = JsonSerializer.Deserialize<T>(File.ReadAllText(jsonPath), options);
-            } else {
-                json = new T();
-                string jsonString = JsonSerializer.Serialize(json, options);
-                File.WriteAllText(jsonPath, jsonString);
-            }
-
-            return json;
-        }
-        private void SaveJson<T>(string name, T json) {
-            string jsonPath = GetPath(name);
-            var options = new JsonSerializerOptions {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true,
-            };
-            string jsonString = JsonSerializer.Serialize(json, options);
-            File.WriteAllText(jsonPath, jsonString);
-        }
-
         public void ToggleFullscreen() {
             bool oldIsFullscreen = _settings.IsFullscreen;
 
@@ -154,6 +109,51 @@ namespace GameProject {
             _settings.IsFullscreen = _settings.IsBorderless;
 
             ApplyFullscreenChange(oldIsFullscreen);
+        }
+
+        public static string GetPath(string name) => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, name);
+        public static T LoadJson<T>(string name) where T : new() {
+            T json;
+            string jsonPath = GetPath(name);
+
+            if (File.Exists(jsonPath)) {
+                var options = new JsonSerializerOptions {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                };
+                json = JsonSerializer.Deserialize<T>(File.ReadAllText(jsonPath), options);
+            } else {
+                json = new T();
+            }
+
+            return json;
+        }
+        public static T EnsureJson<T>(string name) where T : new() {
+            T json;
+            string jsonPath = GetPath(name);
+
+            var options = new JsonSerializerOptions {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true,
+            };
+
+            if (File.Exists(jsonPath)) {
+                json = JsonSerializer.Deserialize<T>(File.ReadAllText(jsonPath), options);
+            } else {
+                json = new T();
+                string jsonString = JsonSerializer.Serialize(json, options);
+                File.WriteAllText(jsonPath, jsonString);
+            }
+
+            return json;
+        }
+        public static void SaveJson<T>(string name, T json) {
+            string jsonPath = GetPath(name);
+            var options = new JsonSerializerOptions {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true,
+            };
+            string jsonString = JsonSerializer.Serialize(json, options);
+            File.WriteAllText(jsonPath, jsonString);
         }
 
         private void ApplyFullscreenChange(bool oldIsFullscreen) {
