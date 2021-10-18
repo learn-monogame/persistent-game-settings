@@ -21,17 +21,13 @@ namespace GameProject {
             Window.AllowUserResizing = true;
 
             IsFixedTimeStep = _settings.IsFixedTimeStep;
-            Window.Position = new Point(_settings.X, _settings.Y);
             _graphics.SynchronizeWithVerticalRetrace = _settings.IsVSync;
-            _graphics.PreferredBackBufferWidth = _settings.Width;
-            _graphics.PreferredBackBufferHeight = _settings.Height;
 
             _settings.IsFullscreen = _settings.IsFullscreen || _settings.IsBorderless;
 
+            RestoreWindow();
             if (_settings.IsFullscreen) {
-                SetFullscreen();
-            } else {
-                _graphics.ApplyChanges();
+                ApplyFullscreenChange(false);
             }
 
             base.Initialize();
@@ -186,10 +182,8 @@ namespace GameProject {
             _graphics.ApplyChanges();
         }
         private void UnsetFullscreen() {
-            RestoreWindow();
-
             _graphics.IsFullScreen = false;
-            _graphics.ApplyChanges();
+            RestoreWindow();
         }
         private void SaveWindow() {
             _settings.X = Window.ClientBounds.X;
@@ -201,6 +195,7 @@ namespace GameProject {
             Window.Position = new Point(_settings.X, _settings.Y);
             _graphics.PreferredBackBufferWidth = _settings.Width;
             _graphics.PreferredBackBufferHeight = _settings.Height;
+            _graphics.ApplyChanges();
         }
 
         GraphicsDeviceManager _graphics;
