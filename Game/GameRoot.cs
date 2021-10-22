@@ -117,43 +117,31 @@ namespace GameProject {
             string jsonPath = GetPath(name);
 
             if (File.Exists(jsonPath)) {
-                var options = new JsonSerializerOptions {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                };
-                json = JsonSerializer.Deserialize<T>(File.ReadAllText(jsonPath), options);
+                json = JsonSerializer.Deserialize<T>(File.ReadAllText(jsonPath), _options);
             } else {
                 json = new T();
-            }
-
-            return json;
-        }
-        public static T EnsureJson<T>(string name) where T : new() {
-            T json;
-            string jsonPath = GetPath(name);
-
-            var options = new JsonSerializerOptions {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true,
-            };
-
-            if (File.Exists(jsonPath)) {
-                json = JsonSerializer.Deserialize<T>(File.ReadAllText(jsonPath), options);
-            } else {
-                json = new T();
-                string jsonString = JsonSerializer.Serialize(json, options);
-                File.WriteAllText(jsonPath, jsonString);
             }
 
             return json;
         }
         public static void SaveJson<T>(string name, T json) {
             string jsonPath = GetPath(name);
-            var options = new JsonSerializerOptions {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true,
-            };
-            string jsonString = JsonSerializer.Serialize(json, options);
+            string jsonString = JsonSerializer.Serialize(json, _options);
             File.WriteAllText(jsonPath, jsonString);
+        }
+        public static T EnsureJson<T>(string name) where T : new() {
+            T json;
+            string jsonPath = GetPath(name);
+
+            if (File.Exists(jsonPath)) {
+                json = JsonSerializer.Deserialize<T>(File.ReadAllText(jsonPath), _options);
+            } else {
+                json = new T();
+                string jsonString = JsonSerializer.Serialize(json, _options);
+                File.WriteAllText(jsonPath, jsonString);
+            }
+
+            return json;
         }
 
         private void ApplyFullscreenChange(bool oldIsFullscreen) {
@@ -216,5 +204,10 @@ namespace GameProject {
             );
         ICondition _toggleBorderless = new KeyboardCondition(Keys.F11);
         ICondition _resetSettings = new KeyboardCondition(Keys.R);
+
+        private static JsonSerializerOptions _options = new JsonSerializerOptions {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = true,
+        };
     }
 }
