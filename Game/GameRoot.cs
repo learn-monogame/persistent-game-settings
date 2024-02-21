@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -14,7 +15,7 @@ namespace GameProject {
             IsMouseVisible = true;
             Content.RootDirectory = "Content";
 
-            _settings = EnsureJson<Settings>("Settings.json");
+            _settings = EnsureJson("Settings.json", SettingsContext.Default.Settings);
         }
 
         protected override void Initialize() {
@@ -47,7 +48,7 @@ namespace GameProject {
                 SaveWindow();
             }
 
-            SaveJson<Settings>("Settings.json", _settings);
+            SaveJson("Settings.json", _settings, SettingsContext.Default.Settings);
 
             base.UnloadContent();
         }
@@ -67,7 +68,7 @@ namespace GameProject {
             if (_resetSettings.Pressed()) {
                 bool oldIsFullscreen = _settings.IsFullscreen;
                 _settings = new Settings();
-                SaveJson("Settings.json", _settings);
+                SaveJson("Settings.json", _settings, SettingsContext.Default.Settings);
 
                 ApplyFullscreenChange(oldIsFullscreen);
             }
@@ -112,32 +113,34 @@ namespace GameProject {
         }
 
         public static string GetPath(string name) => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, name);
-        public static T LoadJson<T>(string name) where T : new() {
+        public static T LoadJson<T>(string name, JsonTypeInfo<T> typeInfo) where T : new() {
             T json;
             string jsonPath = GetPath(name);
 
             if (File.Exists(jsonPath)) {
-                json = JsonSerializer.Deserialize<T>(File.ReadAllText(jsonPath), _options);
+                json = JsonSerializer.Deserialize(File.ReadAllText(jsonPath), typeInfo)!;
             } else {
                 json = new T();
             }
 
             return json;
         }
-        public static void SaveJson<T>(string name, T json) {
+        public static void SaveJson<T>(string name, T json, JsonTypeInfo<T> typeInfo) {
             string jsonPath = GetPath(name);
-            string jsonString = JsonSerializer.Serialize(json, _options);
+            Directory.CreateDirectory(Path.GetDirectoryName(jsonPath)!);
+            string jsonString = JsonSerializer.Serialize(json, typeInfo);
             File.WriteAllText(jsonPath, jsonString);
         }
-        public static T EnsureJson<T>(string name) where T : new() {
+        public static T EnsureJson<T>(string name, JsonTypeInfo<T> typeInfo) where T : new() {
             T json;
             string jsonPath = GetPath(name);
 
             if (File.Exists(jsonPath)) {
-                json = JsonSerializer.Deserialize<T>(File.ReadAllText(jsonPath), _options);
+                json = JsonSerializer.Deserialize(File.ReadAllText(jsonPath), typeInfo)!;
             } else {
                 json = new T();
-                string jsonString = JsonSerializer.Serialize(json, _options);
+                string jsonString = JsonSerializer.Serialize(json, typeInfo);
+                Directory.CreateDirectory(Path.GetDirectoryName(jsonPath)!);
                 File.WriteAllText(jsonPath, jsonString);
             }
 
@@ -204,10 +207,5 @@ namespace GameProject {
             );
         ICondition _toggleBorderless = new KeyboardCondition(Keys.F11);
         ICondition _resetSettings = new KeyboardCondition(Keys.R);
-
-        private static JsonSerializerOptions _options = new JsonSerializerOptions {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true,
-        };
     }
 }
